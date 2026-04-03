@@ -16,3 +16,7 @@ Este repositório foi criado para o desenvolvimento de um compilador para a ling
 - Desenvolvimento do analisador sintático
 - Geração de código VM
 - Testes e ajustes finais
+
+## Documentação
+
+- [Analisador léxico (scanner) — escopo, especificação e roadmap](docs/analisador-lexico.md)
