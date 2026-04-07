@@ -1,2 +1,6 @@
 # Cursor / IDE local (regras e cache do editor — não versionar)
 .cursor/
+out/
+*.class
+*.generated.xml
+actual_output.xml
