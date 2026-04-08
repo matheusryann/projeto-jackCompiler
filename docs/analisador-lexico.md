@@ -1,5 +1,7 @@
 # Jack Compiler — Analisador Léxico (Nand2Tetris)
 
+**Estado:** fase léxica **concluída** (scanner + saída `*T.xml` + testes unitários iniciais). **Próxima fase do compilador:** analisador **sintático** (parser, saída `*.xml` completa), com o mesmo ciclo: testes → corrigir bugs → refinar.
+
 ## Descrição
 
 Este documento descreve a primeira etapa do projeto: implementar um **analisador léxico (scanner)** para a linguagem **Jack**, conforme o curso Nand2Tetris.
@@ -44,18 +46,18 @@ jack-compiler/
 │   ├── Scanner.java
 │   ├── Token.java
 │   └── TokenType.java
-├── tests/
-├── nand2tetris/
-│   └── projects/10/
-└── README.md
+├── src/test/java/jackcompiler/   (testes JUnit, quando presentes)
+├── nand2tetris/projects/10/    (fixtures oficiais: .jack e *T.xml)
+├── docs/
+└── pom.xml
 ```
 
 ---
 
 ## Requisitos
 
-- Java 17+ (recomendado)
-- Maven (opcional)
+- Java 17+
+- Maven (para `mvn compile` / `mvn test`)
 - Git
 
 ---
@@ -63,11 +65,13 @@ jack-compiler/
 ## Como executar
 
 ```bash
-# Compilar
-javac src/main/java/jackcompiler/*.java
+# Com Maven (raiz do projeto)
+mvn compile
+mvn test
 
-# Executar
-java jackcompiler.Main
+# Tokenizer → XML (exemplo; ajustar caminho do .jack)
+javac -d out -encoding UTF-8 src/main/java/jackcompiler/*.java
+java -cp out jackcompiler.Main nand2tetris/projects/10/Square/Main.jack
 ```
 
 ---
@@ -146,30 +150,37 @@ Responsável por:
 - Classe `Token`
 - Enum `TokenType`
 - Scanner básico
-- Reconhecimento de: números, identificadores, keywords, símbolos
+- Reconhecimento de: números, identificadores, keywords, símbolos  
+  **Status: concluído**
 
 ### Fase 2 — Validação
 
-- Geração de XML
+- Geração de XML (`*T.xml`)
 - Escape de caracteres: `<`, `>`, `&`, `"`
-- Comparação com arquivos oficiais
+- Comparação com arquivos oficiais  
+  **Status: concluído**
 
 ### Fase 3 — Intermediário
 
 - Strings (`"texto"`)
 - Comentários: linha (`//`) e bloco (`/* */`)
-- Tratamento de erros léxicos
-
-
-- Geração de XML
-- Escape de caracteres: `<`, `>`, `&`, `"`
-- Comparação com arquivos oficiais
+- Tratamento de erros léxicos  
+  **Status: concluído**
 
 ### Fase 4 — Qualidade
 
-- Testes automatizados (JUnit)
+- Testes automatizados (JUnit), fluxo: escrever/rodar testes → falhas → corrigir bugs → repetir
 - Refatoração do código
-- Melhorias de performance
+- Melhorias de performance (se necessário)  
+  **Status: testes unitários iniciais concluídos** (base para manter regressões sob controlo)
+
+---
+
+### Próxima fase (fora deste documento): analisador sintático
+
+- Parser recursivo (gramática Jack) e árvore / saída `*.xml` (não só tokens).
+- Mesmo método de trabalho: **rodar testes** (oficiais do projeto 10 e/ou JUnit), **comparar com gabaritos**, **corrigir bugs**, iterar até bater com os `.xml` de referência.
+- Documentação específica pode ser acrescentada mais tarde (ex.: `docs/analisador-sintatico.md`).
 
 ---
 
@@ -183,6 +194,6 @@ Responsável por:
 
 ## Observações
 
-- O XML gerado é principalmente para **validação** do scanner
-- O scanner será a base do compilador completo
-- Este trabalho integra a construção de um compilador Jack → VM
+- O XML de tokens (`*T.xml`) serve para **validação** do scanner.
+- O scanner é a **base** do parser sintático (o parser consome a sequência de tokens).
+- O compilador completo Jack → VM segue, após o sintático, para geração de VM (outros projetos Nand2Tetris).

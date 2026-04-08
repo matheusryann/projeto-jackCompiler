@@ -11,9 +11,10 @@
 Este repositório foi criado para o desenvolvimento de um compilador para a linguagem Jack, como parte da disciplina. O projeto será desenvolvido de forma individual e terá como objetivo traduzir programas escritos em Jack para a linguagem da máquina virtual (VM), conforme as especificações da atividade proposta.
 
 ## Etapas previstas
-- Configuração inicial do repositório
-- Desenvolvimento do analisador léxico
-- Desenvolvimento do analisador sintático
+- Configuração inicial do repositório — feito
+- Desenvolvimento do analisador léxico (scanner, `*T.xml`) — feito
+- Testes unitários iniciais (JUnit / `mvn test`) — feito
+- **Em seguida:** analisador sintático (parser, `*.xml`), mesmo ciclo: testes → corrigir bugs → validar com gabaritos
 - Geração de código VM
 - Testes e ajustes finais
 
