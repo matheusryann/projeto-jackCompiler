@@ -176,11 +176,11 @@ Responsável por:
 
 ---
 
-### Próxima fase (fora deste documento): analisador sintático
+### Próxima fase: analisador sintático
 
 - Parser recursivo (gramática Jack) e árvore / saída `*.xml` (não só tokens).
 - Mesmo método de trabalho: **rodar testes** (oficiais do projeto 10 e/ou JUnit), **comparar com gabaritos**, **corrigir bugs**, iterar até bater com os `.xml` de referência.
-- Documentação específica pode ser acrescentada mais tarde (ex.: `docs/analisador-sintatico.md`).
+- Especificação e roadmap: [analisador-sintatico.md](analisador-sintatico.md).
 
 ---
 
