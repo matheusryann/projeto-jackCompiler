@@ -42,7 +42,20 @@ public class Parser {
     }
 
     /**
-     * term → integerConstant | stringConstant | keywordConstant | varName | … (chamadas e indexação depois)
+     * Interpreta uma expressão completa e devolve o XML (útil em testes).
+     */
+    public String parseExpression() {
+        xmlLines.clear();
+        current = 0;
+        indentLevel = 0;
+        compileExpression();
+        return getXml();
+    }
+
+    /**
+     * term → integerConstant | stringConstant | keywordConstant |
+     *        varName | varName '[' expression ']' | subroutineCall |
+     *        '(' expression ')' | unaryOp term
      */
     private void compileTerm() {
         openTag("term");
@@ -51,21 +64,68 @@ public class Parser {
             throw new IllegalStateException("Termo esperado, encontrado fim da entrada");
         }
         switch (t.getType()) {
-            case INTEGER_CONSTANT:
-            case STRING_CONSTANT:
-            case KEYWORD_TRUE:
-            case KEYWORD_FALSE:
-            case KEYWORD_NULL:
-            case KEYWORD_THIS:
-            case IDENTIFIER:
+            case LPAREN -> {
+                match(TokenType.LPAREN);
+                compileExpression();
+                match(TokenType.RPAREN);
+            }
+            case MINUS, TILDE -> {
                 writeToken(t);
                 advance();
-                break;
-            default:
-                throw new IllegalStateException(
-                        "Termo esperado, encontrado: " + t.getLexeme() + " (linha " + t.getLine() + ")");
+                compileTerm();
+            }
+            case INTEGER_CONSTANT, STRING_CONSTANT, KEYWORD_TRUE, KEYWORD_FALSE, KEYWORD_NULL, KEYWORD_THIS -> {
+                writeToken(t);
+                advance();
+            }
+            case IDENTIFIER -> {
+                Token next = peekAhead(1);
+                if (next != null && next.getType() == TokenType.LBRACKET) {
+                    match(TokenType.IDENTIFIER);
+                    match(TokenType.LBRACKET);
+                    compileExpression();
+                    match(TokenType.RBRACKET);
+                } else if (next != null
+                        && (next.getType() == TokenType.LPAREN || next.getType() == TokenType.DOT)) {
+                    compileSubroutineCall();
+                } else {
+                    match(TokenType.IDENTIFIER);
+                }
+            }
+            default -> throw new IllegalStateException(
+                    "Termo esperado, encontrado: " + t.getLexeme() + " (linha " + t.getLine() + ")");
         }
         closeTag("term");
+    }
+
+    /**
+     * subroutineCall → subroutineName '(' expressionList ')' |
+     *                  (className | varName) '.' subroutineName '(' expressionList ')'
+     */
+    private void compileSubroutineCall() {
+        match(TokenType.IDENTIFIER);
+        if (peek() != null && peek().getType() == TokenType.DOT) {
+            match(TokenType.DOT);
+            match(TokenType.IDENTIFIER);
+        }
+        match(TokenType.LPAREN);
+        compileExpressionList();
+        match(TokenType.RPAREN);
+    }
+
+    /**
+     * expressionList → (expression (',' expression)*)?
+     */
+    private void compileExpressionList() {
+        openTag("expressionList");
+        if (peek() != null && peek().getType() != TokenType.RPAREN)  {
+            compileExpression();
+            while (peek() != null && peek().getType() == TokenType.COMMA) {
+                match(TokenType.COMMA);
+                compileExpression();
+            }
+        }
+        closeTag("expressionList");
     }
 
     /**
@@ -101,11 +161,22 @@ public class Parser {
         closeTag("class");
     }
 
+
+
     private Token peek() {
         if (current >= tokens.size()) {
             return null;
         }
         return tokens.get(current);
+    }
+
+    /** Próximo token após {@code peek()}, sem consumir (offset 1 = segundo token à frente). */
+    private Token peekAhead(int offset) {
+        int i = current + offset;
+        if (i >= tokens.size()) {
+            return null;
+        }
+        return tokens.get(i);
     }
 
     private Token advance() {
