@@ -43,10 +43,10 @@ Isso se chama **Desenvolvimento Guiado por Testes (TDD)** simplificado.
 jack-compiler/
 ├── src/main/java/jackcompiler/
 │   ├── Main.java
-│   ├── Scanner.java
-│   ├── Token.java
-│   └── TokenType.java
-├── src/test/java/jackcompiler/   (testes JUnit, quando presentes)
+│   ├── io/TokensXmlWriter.java
+│   ├── lexer/Scanner.java, Token.java, TokenType.java
+│   └── parser/Parser.java
+├── src/test/java/jackcompiler/parser/ParserTest.java
 ├── nand2tetris/projects/10/    (fixtures oficiais: .jack e *T.xml)
 ├── docs/
 └── pom.xml
@@ -69,9 +69,8 @@ jack-compiler/
 mvn compile
 mvn test
 
-# Tokenizer → XML (exemplo; ajustar caminho do .jack)
-javac -d out -encoding UTF-8 src/main/java/jackcompiler/*.java
-java -cp out jackcompiler.Main nand2tetris/projects/10/Square/Main.jack
+# Tokenizer → *T.generated.xml (ajustar caminho do .jack)
+mvn -q compile exec:java "-Dexec.args=nand2tetris/projects/10/Square/Main.jack"
 ```
 
 ---

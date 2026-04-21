@@ -1,15 +1,23 @@
 package jackcompiler;
 
+import jackcompiler.io.TokensXmlWriter;
+import jackcompiler.lexer.Scanner;
+import jackcompiler.lexer.Token;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Ponto de entrada: executa o analisador léxico e grava {@code *T.generated.xml} (tokenizer).
+ */
 public class Main {
     public static void main(String[] args) {
         if (args.length != 1) {
-            System.err.println("Uso: java -cp out jackcompiler.Main <arquivo.jack>");
+            System.err.println("Uso: java -cp target/classes jackcompiler.Main <arquivo.jack>");
+            System.err.println("   ou: mvn -q compile exec:java \"-Dexec.args=<arquivo.jack>\"");
+            System.err.println("(a partir da pasta do projeto; rode mvn compile antes)");
             System.exit(1);
         }
 
@@ -31,22 +39,7 @@ public class Main {
             Scanner scanner = new Scanner(source);
             List<Token> tokens = scanner.tokenize();
 
-            List<String> outputLines = new ArrayList<>();
-            outputLines.add("<tokens>");
-
-            for (Token token : tokens) {
-                if (token.getType() != TokenType.EOF) {
-                    outputLines.add(token.toXml());
-                }
-            }
-
-            outputLines.add("</tokens>");
-
-            String fileName = inputPath.getFileName().toString();
-            String baseName = fileName.substring(0, fileName.lastIndexOf('.'));
-
-            Path outputPath = inputPath.resolveSibling(baseName + "T.generated.xml");
-            Files.write(outputPath, outputLines);
+            Path outputPath = TokensXmlWriter.writeBesideJackFile(inputPath, tokens);
 
             System.out.println("XML gerado com sucesso em:");
             System.out.println(outputPath.toAbsolutePath());

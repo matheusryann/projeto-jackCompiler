@@ -1,6 +1,6 @@
 # Jack Compiler — Analisador Sintático (Nand2Tetris)
 
-**Estado:** planeamento e especificação (implementação a seguir).
+**Estado:** implementação **parcial** — `Parser` em `jackcompiler.parser` cobre classe vazia e expressões/termos (ver testes); a árvore completa e saída `*.xml` por ficheiro ainda em evolução.
 
 **Pré-requisito:** analisador léxico funcional — lista de `Token` compatível com os gabaritos `*T.xml` (ver [analisador-lexico.md](analisador-lexico.md)).
 

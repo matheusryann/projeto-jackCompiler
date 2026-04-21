@@ -1,5 +1,8 @@
-package jackcompiler;
+package jackcompiler.parser;
 
+import jackcompiler.lexer.Scanner;
+import jackcompiler.lexer.Token;
+import jackcompiler.lexer.TokenType;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -87,7 +90,6 @@ class ParserTest {
         String jack = "foo";
         Scanner scanner = new Scanner(jack);
 
-        // Filtrar tokens diferentes de EOF. Tirar o EOF evita que fique um token extra na lista 
         List<Token> tokens = scanner.tokenize().stream()
                 .filter(t -> t.getType() != TokenType.EOF)
                 .toList();

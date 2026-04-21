@@ -1,4 +1,4 @@
-package jackcompiler;
+package jackcompiler.lexer;
 
 import java.util.ArrayList;
 import java.util.HashMap;

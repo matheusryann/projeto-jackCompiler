@@ -1,4 +1,7 @@
-package jackcompiler;
+package jackcompiler.parser;
+
+import jackcompiler.lexer.Token;
+import jackcompiler.lexer.TokenType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -6,14 +9,13 @@ import java.util.List;
 /**
  * Analisador sintático descendente recursivo: consome {@link Token}s e emite XML
  * da árvore de parsing (Nand2Tetris Project 10).
- * 
  */
 public class Parser {
 
     private final List<Token> tokens;
-    private int current;  //lookahead, aponta para o proximo token a ser consumido
+    private int current;  // lookahead, aponta para o próximo token a ser consumido
     private final List<String> xmlLines = new ArrayList<>();
-    private int indentLevel; //controla o nível de indentação do XML
+    private int indentLevel; // controla o nível de indentação do XML
 
     public Parser(List<Token> tokens) {
         this.tokens = tokens;
@@ -118,7 +120,7 @@ public class Parser {
      */
     private void compileExpressionList() {
         openTag("expressionList");
-        if (peek() != null && peek().getType() != TokenType.RPAREN)  {
+        if (peek() != null && peek().getType() != TokenType.RPAREN) {
             compileExpression();
             while (peek() != null && peek().getType() == TokenType.COMMA) {
                 match(TokenType.COMMA);
@@ -161,8 +163,6 @@ public class Parser {
         closeTag("class");
     }
 
-
-
     private Token peek() {
         if (current >= tokens.size()) {
             return null;
@@ -190,7 +190,6 @@ public class Parser {
     private void match(TokenType expected) {
         Token token = peek();
 
-        // Se o token não for o esperado ou for EOF, lança uma exceção
         if (token == null || token.getType() != expected) {
             String got = token == null ? "EOF" : String.valueOf(token.getType());
             throw new IllegalStateException(
@@ -198,8 +197,6 @@ public class Parser {
                             + (token != null ? " (linha " + token.getLine() + ")" : ""));
         }
 
-        // Se for o esperado não for EOF, escreve o token no XML
-        // e avança para o próximo token
         if (expected != TokenType.EOF) {
             writeToken(token);
         }
