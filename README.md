@@ -94,17 +94,19 @@ Em caso de sucesso, o programa **imprime na tela** o caminho absoluto do `*T.gen
 - **`jackcompiler.io`** — escrita do XML do tokenizer em disco (`TokensXmlWriter`).
 - **`jackcompiler.Main`** — ponto de entrada: lê o `.jack`, chama o lexer e grava o `*T.generated.xml`.
 
-Estrutura de pastas:
+Estrutura de pastas (raiz do repositório, ao lado de `pom.xml`):
 
 ```
-src/main/java/jackcompiler/
+src/jackcompiler/          ← código-fonte (pacote Java)
 ├── Main.java
 ├── io/TokensXmlWriter.java
 ├── lexer/Scanner.java, Token.java, TokenType.java
 └── parser/Parser.java
 
-src/test/java/jackcompiler/parser/ParserTest.java
+tests/jackcompiler/parser/ParserTest.java
 ```
+
+O Maven está configurado com `sourceDirectory` = `src` e `testSourceDirectory` = `tests` (layout simples, sem `main/java` aninhado).
 
 ---
 ## Próximas etapas

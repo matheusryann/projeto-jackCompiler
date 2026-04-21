@@ -1,7 +1,7 @@
 {
   "java.project.sourcePaths": [
-    "src/main/java",
-    "src/test/java"
+    "src",
+    "tests"
   ],
   "java.project.outputPath": "out"
 }
