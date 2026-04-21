@@ -30,6 +30,44 @@ public class Parser {
         return getXml();
     }
 
+    /**
+     * Interpreta um único termo e devolve o XML (útil em testes e até integrar em {@code expression}).
+     */
+    public String parseTerm() {
+        xmlLines.clear();
+        current = 0;
+        indentLevel = 0;
+        compileTerm();
+        return getXml();
+    }
+
+    /**
+     * term → integerConstant | stringConstant | keywordConstant | varName | … (chamadas e indexação depois)
+     */
+    private void compileTerm() {
+        openTag("term");
+        Token t = peek();
+        if (t == null) {
+            throw new IllegalStateException("Termo esperado, encontrado fim da entrada");
+        }
+        switch (t.getType()) {
+            case INTEGER_CONSTANT:
+            case STRING_CONSTANT:
+            case KEYWORD_TRUE:
+            case KEYWORD_FALSE:
+            case KEYWORD_NULL:
+            case KEYWORD_THIS:
+            case IDENTIFIER:
+                writeToken(t);
+                advance();
+                break;
+            default:
+                throw new IllegalStateException(
+                        "Termo esperado, encontrado: " + t.getLexeme() + " (linha " + t.getLine() + ")");
+        }
+        closeTag("term");
+    }
+
     private void compileClass() {
         openTag("class");
         match(TokenType.KEYWORD_CLASS);
@@ -67,7 +105,7 @@ public class Parser {
                             + (token != null ? " (linha " + token.getLine() + ")" : ""));
         }
 
-        // Se for o esperado e não for EOF, escreve o token no XML
+        // Se for o esperado não for EOF, escreve o token no XML
         // e avança para o próximo token
         if (expected != TokenType.EOF) {
             writeToken(token);
