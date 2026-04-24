@@ -3,6 +3,7 @@ package jackcompiler.parser;
 import jackcompiler.lexer.Scanner;
 import jackcompiler.lexer.Token;
 import jackcompiler.lexer.TokenType;
+
 import org.junit.jupiter.api.Test;
 
 import java.util.List;

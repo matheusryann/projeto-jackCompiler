@@ -1,7 +1,0 @@
-jackcompiler\lexer\Token.class
-jackcompiler\io\TokensXmlWriter.class
-jackcompiler\lexer\Scanner.class
-jackcompiler\parser\Parser.class
-jackcompiler\lexer\TokenType.class
-jackcompiler\Main.class
-jackcompiler\parser\Parser$1.class
