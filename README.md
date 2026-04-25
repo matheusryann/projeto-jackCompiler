@@ -1,120 +1,144 @@
-# Compilador Jack — trabalho de Compiladores
+# Compilador Jack — Analisador Léxico e Sintático
 
-**Disciplina:** Compiladores (ou equivalente)  
-**Curso:** Engenharia da Computação - Universidade Federal do Maranhão
-
-Este repositório contém o **compilador da linguagem Jack** do curso [Nand2Tetris](https://www.nand2tetris.org/), implementado em **Java**. O objetivo didático é percorrer as fases típicas de um compilador: **análise léxica** → **análise sintática** (árvore em XML) → **geração de código** para a VM (etapas futuras), alinhado aos *Projects 10 e 11* do material oficial.
+**Disciplina:** Compiladores  
+**Curso:** Engenharia da Computação — Universidade Federal do Maranhão
 
 ## Integrantes
 
-- Matheus Ryan Carreiro Costa Correia  
-- João Gabriel de Oliveira Lopes  
+- Matheus Ryan Carreiro Costa Correia
+- João Gabriel de Oliveira Lopes
 
----
+## Descrição
 
-## O que o programa faz (visão rápida)
+Este projeto implementa, em **Java**, as etapas iniciais de um compilador para a linguagem **Jack**, utilizada no curso **Nand2Tetris**. A implementação atual contempla a **análise léxica** e a **análise sintática**, com geração de arquivos XML compatíveis com o formato esperado no Project 10 do Nand2Tetris.
 
-O objetivo do projeto é implementar, de forma incremental, componentes fundamentais de um compilador para a linguagem Jack, em conformidade com os **Projects 10 e 11** do material oficial do Nand2Tetris.
+O desenvolvimento foi organizado de forma incremental, separando a responsabilidade de cada etapa do processo de compilação.
 
-No estado atual, o projeto já realiza:
+## Fluxo de execução
 
-- **análise léxica**, com geração de XML de tokens;
-- **análise sintática**, com geração de XML da árvore sintática.
+O fluxo geral do projeto é:
 
----
+```text
+Arquivo .jack
+    ↓
+Analisador léxico (Scanner)
+    ↓
+Lista de tokens
+    ↓
+Analisador sintático (Parser)
+    ↓
+XML da árvore sintática
+```
 
-## Requisitos de ambiente
+A análise sintática depende da análise léxica, pois o parser não processa diretamente o texto do arquivo `.jack`; ele recebe a sequência de tokens produzida pelo scanner.
 
-| Ferramenta | Versão |
-|------------|--------|
-| Java | 17 ou superior |
-| Maven | 3.x |
+## Funcionalidades implementadas
 
----
+- Leitura de arquivos fonte `.jack`.
+- Identificação de tokens da linguagem Jack:
+  - palavras-chave;
+  - símbolos;
+  - identificadores;
+  - constantes inteiras;
+  - constantes string.
+- Geração de XML de tokens.
+- Construção da árvore sintática em XML para estruturas da linguagem Jack.
+- Testes automatizados com JUnit.
 
-## Como executar
+## Organização do código
 
-**1.** Abra um terminal na pasta do projeto (onde está o arquivo `pom.xml`).
+```text
+src/jackcompiler/
+├── Main.java
+├── ParserMain.java
+├── io/
+│   └── TokensXmlWriter.java
+├── lexer/
+│   ├── Scanner.java
+│   ├── Token.java
+│   └── TokenType.java
+└── parser/
+    └── Parser.java
 
-**2.** Compilar:
+ tests/jackcompiler/parser/
+ └── ParserTest.java
+```
+
+### Principais componentes
+
+| Componente | Responsabilidade |
+|-----------|------------------|
+| `Scanner` | Realiza a análise léxica do código Jack. |
+| `Token` e `TokenType` | Representam os tokens reconhecidos. |
+| `TokensXmlWriter` | Escreve o XML gerado pelo analisador léxico. |
+| `Parser` | Realiza a análise sintática a partir da lista de tokens. |
+| `Main` | Executa a geração do XML de tokens. |
+| `ParserMain` | Executa o fluxo léxico + sintático e gera o XML da árvore sintática. |
+
+## Requisitos
+
+- Java 17 ou superior
+- Maven 3.x
+
+## Compilação
+
+Na raiz do projeto, execute:
 
 ```bash
 mvn compile
 ```
 
-**3.** Rodar o **tokenizer** (gera o XML de tokens ao lado do `.jack`). Depois de `mvn compile`, pode usar **uma** destas formas.
+## Execução do analisador léxico
 
-**Com Maven (invoca a `Main` com o classpath certo):** no **PowerShell**, o `-Dexec.args=...` tem de ir **inteiro entre aspas duplas**, senão o comando pode ser cortado ao meio:
+A classe `jackcompiler.Main` executa apenas a análise léxica e gera um arquivo no formato `NomeT.generated.xml`.
 
-```powershell
-mvn -q compile exec:java "-Dexec.args=nand2tetris/projects/10/Square/Main.jack"
-```
-
-No **Git Bash** ou **Linux/macOS**:
+Exemplo:
 
 ```bash
 mvn -q compile exec:java -Dexec.args="nand2tetris/projects/10/Square/Main.jack"
 ```
 
-**Só com `java` (sem plugin exec):** a partir da pasta do projeto, depois de `mvn compile`:
+Também é possível executar diretamente com Java:
 
-```text
+```bash
 java -cp target/classes jackcompiler.Main nand2tetris/projects/10/Square/Main.jack
 ```
 
-Troque o caminho pelo seu `.jack` (relativo ou absoluto).
+## Execução do analisador sintático
 
-**4.** Rodar os **testes automatizados** (JUnit):
+A classe `jackcompiler.ParserMain` executa o scanner e, em seguida, o parser, gerando um arquivo no formato `NomeP.generated.xml`.
+
+Exemplo:
+
+```bash
+mvn -q compile exec:java -Dexec.mainClass=jackcompiler.ParserMain -Dexec.args="nand2tetris/projects/10/Square/Main.jack"
+```
+
+Também é possível executar diretamente com Java:
+
+```bash
+java -cp target/classes jackcompiler.ParserMain nand2tetris/projects/10/Square/Main.jack
+```
+
+## Testes
+
+Os testes automatizados podem ser executados com:
 
 ```bash
 mvn test
 ```
 
----
+Os testes verificam principalmente o comportamento do parser em diferentes estruturas da linguagem Jack, como classes, expressões, termos, comandos e chamadas de subrotina.
 
-## Entrada esperada
+## Saídas geradas
 
-| Quem consome | O que deve receber |
-|--------------|-------------------|
-| **Linha de comando (`java … jackcompiler.Main`)** | **Exatamente um** argumento: caminho para um arquivo fonte **`.jack`** (texto, UTF-8). Outras extensões são rejeitadas. |
-| **Parser nos testes** | Lista de `Token` vinda do `Scanner`, em geral incluindo `EOF` no fim. |
+| Etapa | Classe executada | Arquivo gerado |
+|------|------------------|----------------|
+| Análise léxica | `jackcompiler.Main` | `NomeT.generated.xml` |
+| Análise sintática | `jackcompiler.ParserMain` | `NomeP.generated.xml` |
 
----
+Os arquivos gerados podem ser comparados com os XMLs de referência fornecidos pelo Nand2Tetris.
 
-## Saída gerada
+## Estado atual do projeto
 
-| Etapa | Onde aparece | Formato |
-|-------|----------------|---------|
-| **Tokenizer (o que a `Main` gera hoje)** | No **mesmo diretório** do `.jack`, arquivo `NomeT.generated.xml` | XML com raiz `<tokens>`, uma tag por token (`keyword`, `symbol`, `integerConstant`, `stringConstant`, `identifier`), como nos gabaritos `*T.xml` do Nand2Tetris. |
-| **Parser (em construção)** | Por enquanto, principalmente **saída em memória** nos testes | XML da árvore sintática (sem `T` no nome), estilo Project 10 — ainda não cobre um programa Jack inteiro. |
-
-Em caso de sucesso, o programa **imprime na tela** o caminho absoluto do `*T.generated.xml` criado.
-
----
-
-## O que já está implementado (por pacote)
-
-- **`jackcompiler.lexer`** — analisador léxico (`Scanner`), representação de tokens (`Token`, `TokenType`), comentários de linha e bloco, serialização dos tokens para XML (`Token#toXml()`).
-- **`jackcompiler.parser`** — parser descendente recursivo: fragmentos da gramática (expressão, termo, lista de expressões, chamadas) e `class` vazia; coberto por `ParserTest`.
-- **`jackcompiler.io`** — escrita do XML do tokenizer em disco (`TokensXmlWriter`).
-- **`jackcompiler.Main`** — ponto de entrada: lê o `.jack`, chama o lexer e grava o `*T.generated.xml`.
-
-Estrutura de pastas (raiz do repositório, ao lado de `pom.xml`):
-
-```
-src/jackcompiler/          ← código-fonte (pacote Java)
-├── Main.java
-├── io/TokensXmlWriter.java
-├── lexer/Scanner.java, Token.java, TokenType.java
-└── parser/Parser.java
-
-tests/jackcompiler/parser/ParserTest.java
-```
-
-O Maven está configurado com `sourceDirectory` = `src` e `testSourceDirectory` = `tests` (layout simples, sem `main/java` aninhado).
-
----
-## Próximas etapas
-
-- Completar o parser para todo o programa Jack e comparar com os `.xml` oficiais.  
-- Geração de código VM (Project 11).  
+Atualmente, o projeto implementa as etapas de análise léxica e análise sintática. A próxima etapa natural seria a geração de código intermediário para a VM, correspondente à continuidade do compilador Jack proposta pelo Nand2Tetris.
