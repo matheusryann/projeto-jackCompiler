@@ -90,7 +90,7 @@ mvn compile
 
 ## Execução do analisador léxico
 
-A classe `jackcompiler.Main` executa apenas a análise léxica e gera um arquivo no formato `NomeT.generated.xml`.
+A classe `Main` executa apenas a análise léxica e gera um arquivo no formato `NomeT.generated.xml`.
 
 Exemplo:
 
@@ -101,23 +101,23 @@ mvn -q compile exec:java -Dexec.args="nand2tetris/projects/10/Square/Main.jack"
 Também é possível executar diretamente com Java:
 
 ```bash
-java -cp target/classes jackcompiler.Main nand2tetris/projects/10/Square/Main.jack
+java -cp target/classes Main nand2tetris/projects/10/Square/Main.jack
 ```
 
 ## Execução do analisador sintático
 
-A classe `jackcompiler.ParserMain` executa o scanner e, em seguida, o parser, gerando um arquivo no formato `NomeP.generated.xml`.
+A classe `ParserMain` executa o scanner e, em seguida, o parser, gerando um arquivo no formato `NomeP.generated.xml`.
 
 Exemplo:
 
 ```bash
-mvn -q compile exec:java -Dexec.mainClass=jackcompiler.ParserMain -Dexec.args="nand2tetris/projects/10/Square/Main.jack"
+mvn -q compile exec:java -Dexec.mainClass=ParserMain -Dexec.args="nand2tetris/projects/10/Square/Main.jack"
 ```
 
 Também é possível executar diretamente com Java:
 
 ```bash
-java -cp target/classes jackcompiler.ParserMain nand2tetris/projects/10/Square/Main.jack
+java -cp target/classes ParserMain nand2tetris/projects/10/Square/Main.jack
 ```
 
 ## Testes
@@ -125,7 +125,7 @@ java -cp target/classes jackcompiler.ParserMain nand2tetris/projects/10/Square/M
 Os testes automatizados podem ser executados com:
 
 ```bash
-mvn test
+mvn clean test
 ```
 
 Os testes verificam principalmente o comportamento do parser em diferentes estruturas da linguagem Jack, como classes, expressões, termos, comandos e chamadas de subrotina.
@@ -134,8 +134,8 @@ Os testes verificam principalmente o comportamento do parser em diferentes estru
 
 | Etapa | Classe executada | Arquivo gerado |
 |------|------------------|----------------|
-| Análise léxica | `jackcompiler.Main` | `NomeT.generated.xml` |
-| Análise sintática | `jackcompiler.ParserMain` | `NomeP.generated.xml` |
+| Análise léxica | `Main` | `NomeT.generated.xml` |
+| Análise sintática | `ParserMain` | `NomeP.generated.xml` |
 
 Os arquivos gerados podem ser comparados com os XMLs de referência fornecidos pelo Nand2Tetris.
 
