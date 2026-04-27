@@ -95,7 +95,7 @@ A classe `Main` executa apenas a análise léxica e gera um arquivo no formato `
 Exemplo:
 
 ```bash
-mvn -q compile exec:java -Dexec.args="nand2tetris/projects/10/Square/Main.jack"
+mvn -q compile exec:java "-Dexec.mainClass=Main" "-Dexec.args=nand2tetris/projects/10/Square/Main.jack
 ```
 
 Também é possível executar diretamente com Java:
