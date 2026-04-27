@@ -101,7 +101,7 @@ mvn -q compile exec:java "-Dexec.mainClass=Main" "-Dexec.args=nand2tetris/projec
 Também é possível executar diretamente com Java:
 
 ```bash
-java -cp target/classes Main nand2tetris/projects/10/Square/Main.jack
+java -cp target/classes Main nand2tetris/projects/10/Square/SquareGame.jack
 ```
 
 ## Execução do analisador sintático
@@ -117,7 +117,7 @@ mvn -q compile exec:java -Dexec.mainClass=ParserMain -Dexec.args="nand2tetris/pr
 Também é possível executar diretamente com Java:
 
 ```bash
-java -cp target/classes ParserMain nand2tetris/projects/10/Square/Main.jack
+java -cp target/classes ParserMain nand2tetris/projects/10/Square/SquareGame.jack
 ```
 
 ## Testes
