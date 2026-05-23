@@ -141,4 +141,4 @@ Os arquivos gerados podem ser comparados com os XMLs de referência fornecidos p
 
 ## Estado atual do projeto
 
-Atualmente, o projeto implementa as etapas de análise léxica e análise sintática. A próxima etapa natural seria a geração de código intermediário para a VM, correspondente à continuidade do compilador Jack proposta pelo Nand2Tetris.
+Atualmente, o projeto implementa as etapas de análise léxica e análise sintática. A  etapa atual está na geração de código intermediário para a VM, correspondente à continuidade do compilador Jack proposta pelo Nand2Tetris.

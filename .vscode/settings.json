@@ -1,8 +1,6 @@
 {
-  "java.project.sourcePaths": [
-    "src",
-    "tests"
-  ],
-  "java.project.outputPath": "out",
-  "java.configuration.updateBuildConfiguration": "interactive"
+  "java.project.sourcePaths": [],
+  "java.project.outputPath": "target/classes",
+  "java.configuration.updateBuildConfiguration": "automatic",
+  "java.import.maven.enabled": true
 }
