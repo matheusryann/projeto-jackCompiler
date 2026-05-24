@@ -1,4 +1,5 @@
 import io.JackFileCollector;
+import parser.CompilationEngine;
 import vm.VMWriter;
 
 import java.io.IOException;
@@ -49,10 +50,24 @@ public class Compiler {
      */
     private static void compileJackFile(Path jackFile) throws IOException {
         Path vmFile = vmPathFor(jackFile);
-
+        
         try (PrintWriter pw = new PrintWriter(Files.newBufferedWriter(vmFile));
              VMWriter vm = new VMWriter(pw)) {
-            // vazio por enquanto — Fase 2
+            
+            // 1. Lê o arquivo
+            String source = Files.readString(jackFile);
+            
+            // 2. Passa pelo Scanner (Léxico)
+            lexer.Scanner scanner = new lexer.Scanner(source);
+            java.util.List<lexer.Token> tokens = scanner.tokenize();
+            
+            // 3. Passa para a Engine de Compilação (Sintático + Semântico)
+            CompilationEngine engine = new CompilationEngine(tokens, vm);
+            engine.compileClass(); // Inicia a compilação
+            
+        } catch (RuntimeException e) {
+            System.err.println("Erro ao compilar " + jackFile.getFileName() + ": " + e.getMessage());
+            e.printStackTrace();
         }
     }
 
@@ -63,3 +78,4 @@ public class Compiler {
         return jackFile.resolveSibling(base + ".vm");
     }
 }
+
