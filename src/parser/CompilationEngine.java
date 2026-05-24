@@ -89,6 +89,9 @@ public class CompilationEngine {
         subroutineName = identifierLexeme();
         match(TokenType.IDENTIFIER);
         match(TokenType.LPAREN);
+        if ("method".equals(subroutineKind)) {
+            symbolTable.reserveArgumentZeroForThis();
+        }
         compileParameterList();
         match(TokenType.RPAREN);
         compileSubroutineBody();
@@ -117,11 +120,40 @@ public class CompilationEngine {
         }
 
         int nLocals = symbolTable.varCount(SymbolTable.KIND_VAR);
-        vmWriter.writeFunction(className + "." + subroutineName, nLocals);
+        vmWriter.writeFunction(functionName(), nLocals);
+        compileSubroutineBootstrap();
 
         compileStatements();
 
         match(TokenType.RBRACE);
+    }
+
+    /**
+     * Após {@code function}: inicializa {@code THIS} conforme tipo da subrotina (nand2tetris 11).
+     */
+    private void compileSubroutineBootstrap() {
+        switch (subroutineKind) {
+            case "method" -> {
+                vmWriter.writePush(VMWriter.SEG_ARG, 0);
+                vmWriter.writePop(VMWriter.SEG_POINTER, 0);
+            }
+            case "constructor" -> {
+                int nFields = symbolTable.varCount(SymbolTable.KIND_FIELD);
+                vmWriter.writePush(VMWriter.SEG_CONST, nFields);
+                vmWriter.writeCall("Memory.alloc", 1);
+                vmWriter.writePop(VMWriter.SEG_POINTER, 0);
+            }
+            case "function" -> { /* sem bootstrap */ }
+            default -> throw new IllegalStateException("Tipo de subrotina: " + subroutineKind);
+        }
+    }
+
+    /** Construtor Jack vira {@code Class.new} na VM. */
+    private String functionName() {
+        if ("constructor".equals(subroutineKind)) {
+            return className + ".new";
+        }
+        return className + "." + subroutineName;
     }
 
     private void compileVarDec() {

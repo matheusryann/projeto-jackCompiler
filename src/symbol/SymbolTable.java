@@ -50,6 +50,13 @@ public class SymbolTable {
         subroutineCounts[1] = 0;
     }
 
+    /**
+     * Métodos Jack: {@code argument 0} é o receiver ({@code this}); parâmetros declarados começam em 1.
+     */
+    public void reserveArgumentZeroForThis() {
+        subroutineCounts[0] = 1;
+    }
+
     public void define(String name, String type, int kind) {
         if (kind == KIND_STATIC || kind == KIND_FIELD) {
             int index = classCounts[kind]++;
