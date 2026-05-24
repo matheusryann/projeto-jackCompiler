@@ -1,5 +1,6 @@
 # Cursor / IDE local (regras e cache do editor — não versionar)
 .cursor/
+AGENTS.md
 docs/
 .docs/
 out/
