@@ -1,4 +1,4 @@
-package jackcompiler.parser;
+package parser;
 
 import lexer.Token;
 import lexer.TokenType;

@@ -1,6 +1,6 @@
 import lexer.Scanner;
 import lexer.Token;
-import jackcompiler.parser.Parser;
+import parser.Parser;
 
 import java.io.IOException;
 import java.nio.file.Files;
