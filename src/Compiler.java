@@ -31,14 +31,19 @@ public class Compiler {
             }
 
             for (Path jackFile : jackFiles) {
-                compileJackFile(jackFile);
+                try {
+                    compileJackFile(jackFile);
+                } catch (RuntimeException e) {
+                    throw new IllegalStateException(
+                            "Erro ao compilar " + jackFile.getFileName() + ": " + e.getMessage(), e);
+                }
                 System.out.println("Gerado: " + vmPathFor(jackFile).toAbsolutePath());
             }
 
         } catch (IOException e) {
             System.err.println("Erro de I/O: " + e.getMessage());
             System.exit(1);
-        } catch (IllegalArgumentException e) {
+        } catch (RuntimeException e) {
             System.err.println(e.getMessage());
             System.exit(1);
         }
@@ -64,10 +69,6 @@ public class Compiler {
             // 3. Passa para a Engine de Compilação (Sintático + Semântico)
             CompilationEngine engine = new CompilationEngine(tokens, vm);
             engine.compileClass(); // Inicia a compilação
-            
-        } catch (RuntimeException e) {
-            System.err.println("Erro ao compilar " + jackFile.getFileName() + ": " + e.getMessage());
-            e.printStackTrace();
         }
     }
 

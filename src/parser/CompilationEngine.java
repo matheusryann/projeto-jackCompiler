@@ -148,11 +148,7 @@ public class CompilationEngine {
         }
     }
 
-    /** Construtor Jack vira {@code Class.new} na VM. */
     private String functionName() {
-        if ("constructor".equals(subroutineKind)) {
-            return className + ".new";
-        }
         return className + "." + subroutineName;
     }
 
@@ -319,11 +315,12 @@ public class CompilationEngine {
             }
             case STRING_CONSTANT -> {
                 advance();
-                // passo 2.10
+                writeStringConstant(t.getLexeme());
             }
             case KEYWORD_TRUE -> {
                 advance();
-                vmWriter.writePush(VMWriter.SEG_CONST, -1);
+                vmWriter.writePush(VMWriter.SEG_CONST, 0);
+                vmWriter.writeArithmetic("not");
             }
             case KEYWORD_FALSE, KEYWORD_NULL -> {
                 advance();
@@ -351,30 +348,27 @@ public class CompilationEngine {
         }
     }
 
-    /**
-     * Endereço do elemento: base + índice → {@code THAT} aponta para a célula.
-     * Consome {@code [ expression ]}.
-     */
+    /** Deixa no topo da pilha o endereco do elemento: base + indice. */
     private void compileArrayIndexAddress(String arrayName) {
         compileVariablePush(arrayName);
         match(TokenType.LBRACKET);
         compileExpression();
         vmWriter.writeArithmetic("add");
-        vmWriter.writePop(VMWriter.SEG_POINTER, 1);
         match(TokenType.RBRACKET);
     }
 
-    /** Lê o valor da célula apontada por {@code THAT} (deixa valor no topo da pilha). */
+    /** Le o valor da celula cujo endereco esta no topo da pilha. */
     private void compileArrayLoad() {
+        vmWriter.writePop(VMWriter.SEG_POINTER, 1);
         vmWriter.writePush(VMWriter.SEG_THAT, 0);
     }
 
-    /** Grava o valor no topo da pilha na célula apontada por {@code THAT}. */
+    /** Grava o valor no endereco que esta logo abaixo dele na pilha. */
     private void compileArrayStore() {
         vmWriter.writePop(VMWriter.SEG_TEMP, 0);
-        vmWriter.writePop(VMWriter.SEG_THAT, 0);
+        vmWriter.writePop(VMWriter.SEG_POINTER, 1);
         vmWriter.writePush(VMWriter.SEG_TEMP, 0);
-        vmWriter.writePop(VMWriter.SEG_THAT, 1);
+        vmWriter.writePop(VMWriter.SEG_THAT, 0);
     }
 
     private void compileSubroutineCall() {
@@ -384,21 +378,41 @@ public class CompilationEngine {
     }
 
     private void compileSubroutineCallFromName(String firstName) {
-        String callName = firstName;
+        String callName;
+        int nArgs = 0;
 
         if (peek() != null && peek().getType() == TokenType.DOT) {
             match(TokenType.DOT);
-            callName = callName + "." + identifierLexeme();
+            String secondName = identifierLexeme();
             match(TokenType.IDENTIFIER);
+
+            if (symbolTable.contains(firstName)) {
+                compileVariablePush(firstName);
+                callName = symbolTable.typeOf(firstName) + "." + secondName;
+                nArgs = 1;
+            } else {
+                callName = firstName + "." + secondName;
+            }
         } else {
-            callName = className + "." + callName;
+            vmWriter.writePush(VMWriter.SEG_POINTER, 0);
+            callName = className + "." + firstName;
+            nArgs = 1;
         }
 
         match(TokenType.LPAREN);
-        int nArgs = compileExpressionList();
+        nArgs += compileExpressionList();
         match(TokenType.RPAREN);
 
         vmWriter.writeCall(callName, nArgs);
+    }
+
+    private void writeStringConstant(String value) {
+        vmWriter.writePush(VMWriter.SEG_CONST, value.length());
+        vmWriter.writeCall("String.new", 1);
+        for (int i = 0; i < value.length(); i++) {
+            vmWriter.writePush(VMWriter.SEG_CONST, value.charAt(i));
+            vmWriter.writeCall("String.appendChar", 2);
+        }
     }
 
     private int compileExpressionList() {

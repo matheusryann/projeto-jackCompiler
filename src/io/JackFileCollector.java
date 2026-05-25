@@ -30,7 +30,7 @@ public final class JackFileCollector {
         }
 
         if (Files.isDirectory(input)) {
-            try (Stream<Path> stream = Files.list(input)) {
+            try (Stream<Path> stream = Files.walk(input)) {
                 return stream
                         .filter(Files::isRegularFile)
                         .filter(JackFileCollector::isJackFile)

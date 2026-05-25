@@ -41,6 +41,20 @@ class JackFileCollectorTest {
     }
 
     @Test
+    void collect_directory_includesJackFilesInSubdirectories(@TempDir Path temp) throws IOException {
+        Path nested = temp.resolve("Square");
+        Files.createDirectory(nested);
+        Files.writeString(temp.resolve("Main.jack"), "");
+        Files.writeString(nested.resolve("Square.jack"), "");
+
+        List<Path> result = JackFileCollector.collect(temp);
+
+        assertEquals(2, result.size());
+        assertTrue(result.get(0).endsWith("Main.jack"));
+        assertTrue(result.get(1).endsWith(Path.of("Square", "Square.jack")));
+    }
+
+    @Test
     void collect_emptyDirectory_returnsEmptyList(@TempDir Path temp) throws IOException {
         List<Path> result = JackFileCollector.collect(temp);
         assertEquals(0, result.size());
