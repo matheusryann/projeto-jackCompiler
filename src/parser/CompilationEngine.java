@@ -190,18 +190,10 @@ public class CompilationEngine {
         match(TokenType.IDENTIFIER);
 
         if (peek() != null && peek().getType() == TokenType.LBRACKET) {
-            compileVariablePush(name);
-            match(TokenType.LBRACKET);
-            compileExpression();
-            vmWriter.writeArithmetic("add");
-            vmWriter.writePop(VMWriter.SEG_POINTER, 1);
-            match(TokenType.RBRACKET);
+            compileArrayIndexAddress(name);
             match(TokenType.EQ);
             compileExpression();
-            vmWriter.writePop(VMWriter.SEG_TEMP, 0);
-            vmWriter.writePop(VMWriter.SEG_THAT, 0);
-            vmWriter.writePush(VMWriter.SEG_TEMP, 0);
-            vmWriter.writePop(VMWriter.SEG_THAT, 1);
+            compileArrayStore();
         } else {
             match(TokenType.EQ);
             compileExpression();
@@ -343,31 +335,56 @@ public class CompilationEngine {
             }
             case IDENTIFIER -> {
                 String name = t.getLexeme();
-                if (peekAhead(1) != null && peekAhead(1).getType() == TokenType.LBRACKET) {
-                    compileVariablePush(name);
-                    match(TokenType.IDENTIFIER);
-                    match(TokenType.LBRACKET);
-                    compileExpression();
-                    match(TokenType.RBRACKET);
-                    vmWriter.writeArithmetic("add");
-                    vmWriter.writePop(VMWriter.SEG_POINTER, 1);
-                    vmWriter.writePush(VMWriter.SEG_THAT, 0);
-                } else if (peekAhead(1) != null
-                        && (peekAhead(1).getType() == TokenType.LPAREN
-                        || peekAhead(1).getType() == TokenType.DOT)) {
-                    compileSubroutineCall();
+                advance();
+                if (peek() != null && peek().getType() == TokenType.LBRACKET) {
+                    compileArrayIndexAddress(name);
+                    compileArrayLoad();
+                } else if (peek() != null
+                        && (peek().getType() == TokenType.LPAREN
+                        || peek().getType() == TokenType.DOT)) {
+                    compileSubroutineCallFromName(name);
                 } else {
                     compileVariablePush(name);
-                    match(TokenType.IDENTIFIER);
                 }
             }
             default -> throw syntaxError("term: " + t.getLexeme());
         }
     }
 
+    /**
+     * Endereço do elemento: base + índice → {@code THAT} aponta para a célula.
+     * Consome {@code [ expression ]}.
+     */
+    private void compileArrayIndexAddress(String arrayName) {
+        compileVariablePush(arrayName);
+        match(TokenType.LBRACKET);
+        compileExpression();
+        vmWriter.writeArithmetic("add");
+        vmWriter.writePop(VMWriter.SEG_POINTER, 1);
+        match(TokenType.RBRACKET);
+    }
+
+    /** Lê o valor da célula apontada por {@code THAT} (deixa valor no topo da pilha). */
+    private void compileArrayLoad() {
+        vmWriter.writePush(VMWriter.SEG_THAT, 0);
+    }
+
+    /** Grava o valor no topo da pilha na célula apontada por {@code THAT}. */
+    private void compileArrayStore() {
+        vmWriter.writePop(VMWriter.SEG_TEMP, 0);
+        vmWriter.writePop(VMWriter.SEG_THAT, 0);
+        vmWriter.writePush(VMWriter.SEG_TEMP, 0);
+        vmWriter.writePop(VMWriter.SEG_THAT, 1);
+    }
+
     private void compileSubroutineCall() {
         String callName = identifierLexeme();
         match(TokenType.IDENTIFIER);
+        compileSubroutineCallFromName(callName);
+    }
+
+    private void compileSubroutineCallFromName(String firstName) {
+        String callName = firstName;
 
         if (peek() != null && peek().getType() == TokenType.DOT) {
             match(TokenType.DOT);
