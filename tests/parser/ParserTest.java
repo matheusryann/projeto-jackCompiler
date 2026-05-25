@@ -1,6 +1,5 @@
 package parser;
 
-import parser.Parser;
 import lexer.Scanner;
 import lexer.Token;
 import lexer.TokenType;

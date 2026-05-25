@@ -516,14 +516,6 @@ public class CompilationEngine {
         return tokens.get(current);
     }
 
-    private Token peekAhead(int offset) {
-        int i = current + offset;
-        if (i >= tokens.size()) {
-            return null;
-        }
-        return tokens.get(i);
-    }
-
     private void advance() {
         if (current < tokens.size()) {
             current++;
