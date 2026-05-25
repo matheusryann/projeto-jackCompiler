@@ -9,3 +9,4 @@ out/
 actual_output.xml
 target/
 *.class
+nand2tetris/projects/11/**/*.vm
