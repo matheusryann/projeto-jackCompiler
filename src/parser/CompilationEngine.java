@@ -184,31 +184,50 @@ public class CompilationEngine {
         }
     }
 
-    /** Parse completo; emissão VM no passo 2.6. */
     private void compileLet() {
         match(TokenType.KEYWORD_LET);
+        String name = identifierLexeme();
         match(TokenType.IDENTIFIER);
 
         if (peek() != null && peek().getType() == TokenType.LBRACKET) {
+            compileVariablePush(name);
             match(TokenType.LBRACKET);
             compileExpression();
+            vmWriter.writeArithmetic("add");
+            vmWriter.writePop(VMWriter.SEG_POINTER, 1);
             match(TokenType.RBRACKET);
+            match(TokenType.EQ);
+            compileExpression();
+            vmWriter.writePop(VMWriter.SEG_TEMP, 0);
+            vmWriter.writePop(VMWriter.SEG_THAT, 0);
+            vmWriter.writePush(VMWriter.SEG_TEMP, 0);
+            vmWriter.writePop(VMWriter.SEG_THAT, 1);
+        } else {
+            match(TokenType.EQ);
+            compileExpression();
+            compileVariablePop(name);
         }
 
-        match(TokenType.EQ);
-        compileExpression();
         match(TokenType.SEMICOLON);
     }
 
-    /** Parse completo; emissão VM no passo 2.7. */
     private void compileIf() {
+        String labelFalse = newLabel("IF_FALSE");
+        String labelEnd = newLabel("IF_END");
+
         match(TokenType.KEYWORD_IF);
         match(TokenType.LPAREN);
         compileExpression();
         match(TokenType.RPAREN);
+        vmWriter.writeArithmetic("not");
+        vmWriter.writeIf(labelFalse);
+
         match(TokenType.LBRACE);
         compileStatements();
         match(TokenType.RBRACE);
+
+        vmWriter.writeGoto(labelEnd);
+        vmWriter.writeLabel(labelFalse);
 
         if (peek() != null && peek().getType() == TokenType.KEYWORD_ELSE) {
             match(TokenType.KEYWORD_ELSE);
@@ -216,17 +235,29 @@ public class CompilationEngine {
             compileStatements();
             match(TokenType.RBRACE);
         }
+
+        vmWriter.writeLabel(labelEnd);
     }
 
-    /** Parse completo; emissão VM no passo 2.7. */
     private void compileWhile() {
+        String labelTop = newLabel("WHILE_TOP");
+        String labelEnd = newLabel("WHILE_END");
+
+        vmWriter.writeLabel(labelTop);
+
         match(TokenType.KEYWORD_WHILE);
         match(TokenType.LPAREN);
         compileExpression();
         match(TokenType.RPAREN);
+        vmWriter.writeArithmetic("not");
+        vmWriter.writeIf(labelEnd);
+
         match(TokenType.LBRACE);
         compileStatements();
         match(TokenType.RBRACE);
+
+        vmWriter.writeGoto(labelTop);
+        vmWriter.writeLabel(labelEnd);
     }
 
     private void compileDo() {
@@ -370,6 +401,11 @@ public class CompilationEngine {
     private void compileVariablePush(String name) {
         int kind = symbolTable.kindOf(name);
         vmWriter.writePush(segmentFor(kind), symbolTable.indexOf(name));
+    }
+
+    private void compileVariablePop(String name) {
+        int kind = symbolTable.kindOf(name);
+        vmWriter.writePop(segmentFor(kind), symbolTable.indexOf(name));
     }
 
     private static String segmentFor(int kind) {
