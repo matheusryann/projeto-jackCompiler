@@ -98,67 +98,6 @@ tests/
 - Maven 3.x
 - Ferramentas oficiais nand2tetris para validacao no VM Emulator
 
-## Compilacao do projeto
-
-Na raiz do repositorio, execute:
-
-```bash
-mvn compile
-```
-
-## Uso do compilador VM
-
-Para compilar um arquivo Jack unico:
-
-```bash
-java -cp target/classes Compiler nand2tetris/projects/11/Seven/Main.jack
-```
-
-Para compilar um diretorio inteiro:
-
-```bash
-java -cp target/classes Compiler nand2tetris/projects/11/Pong
-```
-
-Cada arquivo `.jack` gera um arquivo `.vm` com o mesmo nome no mesmo diretorio.
-Por exemplo:
-
-```text
-Square.jack -> Square.vm
-Main.jack   -> Main.vm
-```
-
-## Testes automatizados
-
-Execute:
-
-```bash
-mvn test
-```
-
-Os testes cobrem componentes como:
-
-- escrita de comandos VM pelo `VMWriter`;
-- controle de escopo pela `SymbolTable`;
-- coleta de arquivos Jack por arquivo ou diretorio;
-- comportamentos principais do parser.
-
-## Validacao no VM Emulator
-
-A validacao funcional foi feita com os programas oficiais do Project 11:
-
-| Programa | Resultado validado |
-|----------|--------------------|
-| `Seven` | Imprime `7`. |
-| `Average` | Entrada `3, 10, 20, 30`; imprime media `20`. |
-| `ConvertToBin` | Entrada em `RAM[8000] = 7`; bits gerados em `RAM[8001...]`. |
-| `ComplexArrays` | Todos os testes exibem `expected result` igual ao `actual result`. |
-| `Square` | Projeto com multiplos arquivos compila e executa o quadrado interativo. |
-| `Pong` | Projeto com multiplos arquivos compila e executa o jogo Pong. |
-
-Durante os testes completos no VM Emulator, a animacao foi desativada
-(`Animate: No animation`) para acelerar a execucao.
-
 ## Como reproduzir a compilacao em lote e os testes
 
 Primeiro, compile o projeto Java:
@@ -204,6 +143,29 @@ Os testes unitarios tambem podem ser reproduzidos com:
 ```bash
 mvn test
 ```
+
+Os testes cobrem componentes como:
+
+- escrita de comandos VM pelo `VMWriter`;
+- controle de escopo pela `SymbolTable`;
+- coleta de arquivos Jack por arquivo ou diretorio;
+- comportamentos principais do parser.
+
+## Validacao no VM Emulator
+
+A validacao funcional foi feita com os programas oficiais do Project 11:
+
+| Programa | Resultado validado |
+|----------|--------------------|
+| `Seven` | Imprime `7`. |
+| `Average` | Entrada `3, 10, 20, 30`; imprime media `20`. |
+| `ConvertToBin` | Entrada em `RAM[8000] = 7`; bits gerados em `RAM[8001...]`. |
+| `ComplexArrays` | Todos os testes exibem `expected result` igual ao `actual result`. |
+| `Square` | Projeto com multiplos arquivos compila e executa o quadrado interativo. |
+| `Pong` | Projeto com multiplos arquivos compila e executa o jogo Pong. |
+
+Durante os testes completos no VM Emulator, a animacao foi desativada
+(`Animate: No animation`) para acelerar a execucao.
 
 ## Desafios enfrentados
 
